@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SimpleNote</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- ===== LINKE SEITENLEISTE ===== -->
+    <aside class="sidebar">
+
+        <!-- App-Name -->
+        <div class="sidebar-logo">Simple<br>Note</div>
+
+        <!-- Plus-Button: Klick öffnet das Modal zum Erstellen einer neuen Notiz -->
+        <button class="add-note-btn" id="addNoteBtn" title="Neue Notiz erstellen">
+            <span class="plus-icon">+</span>
+        </button>
+
+        <!-- Dekorative farbige Punkte (angelehnt an das Design-Referenzbild) -->
+        <div class="sidebar-dots">
+            <span class="dot" style="background-color: #FFD166;"></span>
+            <span class="dot" style="background-color: #F4845F;"></span>
+            <span class="dot" style="background-color: #B5A8D5;"></span>
+            <span class="dot" style="background-color: #4ECDC4;"></span>
+            <span class="dot" style="background-color: #C5E063;"></span>
+        </div>
+
+    </aside>
+
+    <!-- ===== HAUPT-INHALTSBEREICH ===== -->
+    <main class="main-content">
+
+        <!-- Kopfzeile mit Suchleiste -->
+        <header class="top-header">
+            <div class="search-container">
+                <!-- Lupen-Icon (SVG) -->
+                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="#aaa" stroke-width="2.5"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <!-- Suchfeld -->
+                <input
+                    type="text"
+                    id="searchInput"
+                    class="search-input"
+                    placeholder="Search"
+                    autocomplete="off"
+                >
+            </div>
+        </header>
+
+        <!-- Notizen-Bereich -->
+        <section class="notes-section">
+            <!-- Große Überschrift -->
+            <h1 class="notes-heading">Notes</h1>
+
+            <!-- Das Grid, in das die Notizkarten per JavaScript eingefügt werden -->
+            <div class="notes-grid" id="notesGrid">
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===== MODAL: Notiz erstellen oder bearbeiten ===== -->
+    <!--
+        Das Modal ist immer im DOM vorhanden, wird aber per CSS
+        ausgeblendet (visibility: hidden + opacity: 0).
+        Durch Hinzufügen der Klasse "active" wird es sichtbar.
+    -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="noteModal">
+
+            <!-- Modal-Kopfzeile: Titelfeld links, Datumsfeld rechts -->
+            <div class="modal-header">
+                <input
+                    type="text"
+                    id="modalTitle"
+                    class="modal-title-input"
+                    placeholder="Titel der Notiz"
+                >
+                <input
+                    type="date"
+                    id="modalDate"
+                    class="modal-date-input"
+                >
+            </div>
+
+            <!-- Modal-Hauptbereich: Textarea links, Format-Panel rechts -->
+            <div class="modal-body">
+
+                <!-- Großes Textfeld für den Notizinhalt -->
+                <textarea
+                    id="modalContent"
+                    class="modal-content-input"
+                    placeholder="Schreibe hier deinen Notizinhalt...
+
+Tipp: Nutze das Format-Panel rechts, um Überschriften,
+fetten Text oder Bildunterschriften einzufügen."
+                ></textarea>
+
+                <!-- Format-Panel (rechte Seite, angelehnt an format.png) -->
+                <div class="format-panel">
+                    <div class="format-panel-header">Format</div>
+                    <div class="format-section-label">TEXT</div>
+                    <!-- Buttons zum Einfügen von Formatierungs-Markern -->
+                    <div class="format-buttons-grid">
+                        <button class="format-btn" data-format="title">Title</button>
+                        <button class="format-btn" data-format="subtitle">Subtitle</button>
+                        <button class="format-btn" data-format="heading">Heading</button>
+                        <button class="format-btn active" data-format="body">Body</button>
+                        <button class="format-btn" data-format="strong">Strong</button>
+                        <button class="format-btn" data-format="caption">Caption</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal-Fußzeile: Abbrechen- und Speichern-Button -->
+            <div class="modal-footer">
+                <button class="btn-cancel" id="cancelBtn">Abbrechen</button>
+                <button class="btn-save" id="saveBtn">Speichern</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JavaScript am Ende einbinden, damit das DOM bereit ist -->
+    <script src="script.js"></script>
+
+</body>
+</html>
