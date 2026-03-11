@@ -68,6 +68,13 @@ var nextId = 7;
 // Die aktuell bearbeitete Notiz (null = wir erstellen gerade eine neue Notiz)
 var selectedNote = null;
 
+// ---- Animations-Konstanten ----
+// Diese Werte müssen mit den CSS-Transitionen übereinstimmen.
+// Wenn du die CSS-Dauer änderst, passe auch hier den Wert an.
+var CARD_STAGGER_DELAY_MS    = 75;  // Verzögerung zwischen den Karten beim Einblenden
+var DELETE_ANIMATION_MS      = 380; // Muss mit .note-card.deleting transition-Dauer übereinstimmen
+var MODAL_ANIMATION_MS       = 350; // Muss mit .modal transition-Dauer übereinstimmen
+
 // Farben für die Notizkarten (rotieren durch das Array)
 // Diese Farben sind dem Design-Referenzbild nachempfunden
 var noteColors = [
@@ -194,7 +201,7 @@ function renderNotes() {
 
         // Stagger-Effekt: Karten erscheinen nacheinander mit kleiner Verzögerung
         // Dies erzeugt einen schönen Wellen-Effekt beim Laden
-        var delayMs = j * 75;
+        var delayMs = j * CARD_STAGGER_DELAY_MS;
         (function(cardElement, delay) {
             setTimeout(function() {
                 cardElement.classList.add("visible");
@@ -434,7 +441,7 @@ function deleteNote(noteId) {
 
         // Grid neu rendern
         renderNotes();
-    }, 380); // 380ms = Dauer der CSS-Lösch-Animation
+    }, DELETE_ANIMATION_MS); // Dauer der CSS-Lösch-Animation (.note-card.deleting)
 }
 
 
@@ -526,7 +533,7 @@ function closeModal() {
     // Overlay erst nach Ende der Modal-Animation ausblenden
     setTimeout(function() {
         overlay.classList.remove("active");
-    }, 350);
+    }, MODAL_ANIMATION_MS); // Warten bis die Modal-Schließanimation abgeschlossen ist
 
     // Ausgewählte Notiz zurücksetzen
     selectedNote = null;
