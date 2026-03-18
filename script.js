@@ -6,7 +6,7 @@
 // STRUKTUR:
 //   1. Daten (Array von Notizen)
 //   2. Hilfsfunktionen
-//   3. API-Platzhalter (für spätere Backend-Anbindung)
+//   3. API-Funktionen (Backend-Anbindung per fetch)
 //   4. Render-Funktionen (DOM aktualisieren)
 //   5. CRUD-Funktionen (Create, Read, Update, Delete)
 //   6. Format-Funktion
@@ -19,51 +19,15 @@
 
 // ============================================================
 // 1. DATEN
-// Alle Notizen werden in diesem Array gespeichert.
-// Jede Notiz ist ein Objekt mit den Feldern: id, title, content, date
+// Alle Notizen werden in diesem Array als lokaler Cache gespeichert.
+// Jede Notiz ist ein Objekt mit den Feldern: id, title, content
 // ============================================================
 
-var notes = [
-    {
-        id: 1,
-        title: "Willkommen bei SimpleNote",
-        content: "Das ist deine erste Notiz! Klicke auf den Bleistift-Button, um sie zu bearbeiten. Mit dem Papierkorb kannst du sie löschen. Und mit dem + links erstellst du neue Notizen.",
-        date: "2024-05-21"
-    },
-    {
-        id: 2,
-        title: "Einkaufsliste",
-        content: "Milch, Brot, Butter\nÄpfel, Bananen\nKaffee, Tee\nNudeln, Tomatensoße\nKäse, Joghurt",
-        date: "2024-05-22"
-    },
-    {
-        id: 3,
-        title: "Projektideen für 2024",
-        content: "# Neue App Idee\nEine App, die Aufgaben automatisch priorisiert.\n\n## Details\nNutzer gibt Aufgaben ein und die App sortiert sie nach Wichtigkeit und Deadline.\n\n### Nächste Schritte\nPrototyp skizzieren, Tech-Stack festlegen.",
-        date: "2024-05-25"
-    },
-    {
-        id: 4,
-        title: "Lernziele dieses Jahr",
-        content: "JavaScript vertiefen\nCSS Animationen meistern\nHTML Semantik verbessern\nEin vollständiges Portfolio-Projekt bauen\nSQL Grundlagen wiederholen",
-        date: "2024-05-26"
-    },
-    {
-        id: 5,
-        title: "Design Inspiration",
-        content: "Dribbble und Behance regelmäßig anschauen. Interessante Farb-Paletten und Layouts für zukünftige Projekte notieren. Besonders: minimalistische UIs mit starken Typografien.",
-        date: "2024-05-28"
-    },
-    {
-        id: 6,
-        title: "Meeting-Notizen",
-        content: "Nächstes Meeting: Freitag 14:00 Uhr\nAgenda: Projektstand besprechen\nTeilnehmer: Team Alpha\nWichtig: Präsentation vorbereiten!",
-        date: "2024-05-30"
-    }
-];
+// Backend-URL – anpassen falls der Container unter einer anderen Adresse erreichbar ist
+var BASE_URL = "http://localhost:8080";
 
-// Zähler für neue IDs (wird bei jeder neuen Notiz um 1 erhöht)
-var nextId = 7;
+// Lokaler Cache der vom Backend geladenen Notizen
+var notes = [];
 
 // Die aktuell bearbeitete Notiz (null = wir erstellen gerade eine neue Notiz)
 var selectedNote = null;
@@ -131,25 +95,24 @@ function getTodayDate() {
 
 
 // ============================================================
-// 3. API-PLATZHALTER
-// Diese Funktionen würde man bei einer Backend-Anbindung
-// durch echte fetch()-Aufrufe ersetzen.
-//
-// Beispiel für eine spätere Implementierung:
-//   function loadAllNotes() {
-//       fetch("/api/notes")
-//           .then(function(response) { return response.json(); })
-//           .then(function(data) {
-//               notes = data;
-//               renderNotes();
-//           });
-//   }
+// 3. API-FUNKTIONEN
+// Anbindung an das Spring-Boot-Backend per fetch()
 // ============================================================
 
-// Lädt alle Notizen (aktuell direkt aus dem Array)
+// Lädt alle Notizen vom Backend und rendert sie
 function loadAllNotes() {
-    // Aktuell: Notizen sind schon im Array gespeichert
-    renderNotes();
+    fetch(BASE_URL + "/notes")
+        .then(function(response) {
+            if (!response.ok) { throw new Error("HTTP " + response.status); }
+            return response.json();
+        })
+        .then(function(data) {
+            notes = data;
+            renderNotes();
+        })
+        .catch(function(error) {
+            console.error("Fehler beim Laden der Notizen:", error);
+        });
 }
 
 
@@ -363,52 +326,54 @@ function saveNote() {
 
     if (selectedNote === null) {
         // ---- NEUE NOTIZ erstellen ----
-        //
-        // BACKEND-PLATZHALTER: Hier könnte später ein API-Call stehen:
-        // fetch("/api/notes", {
-        //     method: "POST",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify({ title: title, content: content, date: date })
-        // }).then(function(res) { return res.json(); })
-        //   .then(function(newNote) { notes.unshift(newNote); renderNotes(); });
-
-        var newNote = {
-            id:      nextId,
-            title:   title,
-            content: content,
-            date:    date
-        };
-
-        // ID-Zähler erhöhen, damit die nächste Notiz eine andere ID bekommt
-        nextId = nextId + 1;
-
-        // Neue Notiz am Anfang des Arrays einfügen (neueste zuerst)
-        notes.unshift(newNote);
+        fetch(BASE_URL + "/notes", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ title: title, content: content })
+        })
+            .then(function(response) {
+                if (!response.ok) { throw new Error("HTTP " + response.status); }
+                return response.json();
+            })
+            .then(function(newNote) {
+                // Vom Backend zurückgegebenes Objekt mit lokalem Datum ergänzen
+                newNote.date = date;
+                notes.unshift(newNote);
+                closeModal();
+                renderNotes();
+            })
+            .catch(function(error) {
+                console.error("Fehler beim Erstellen der Notiz:", error);
+            });
 
     } else {
         // ---- BESTEHENDE NOTIZ aktualisieren ----
-        //
-        // BACKEND-PLATZHALTER: Hier könnte später ein API-Call stehen:
-        // fetch("/api/notes/" + selectedNote.id, {
-        //     method: "PUT",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify({ title: title, content: content, date: date })
-        // }).then(function() { renderNotes(); });
-
-        // Notiz im Array finden und aktualisieren
-        for (var i = 0; i < notes.length; i++) {
-            if (notes[i].id === selectedNote.id) {
-                notes[i].title   = title;
-                notes[i].content = content;
-                notes[i].date    = date;
-                break; // Gefunden, Schleife beenden
-            }
-        }
+        fetch(BASE_URL + "/notes/" + selectedNote.id, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ title: title, content: content })
+        })
+            .then(function(response) {
+                if (!response.ok) { throw new Error("HTTP " + response.status); }
+                return response.json();
+            })
+            .then(function(updatedNote) {
+                // Lokalen Cache aktualisieren
+                for (var i = 0; i < notes.length; i++) {
+                    if (notes[i].id === selectedNote.id) {
+                        notes[i].title   = updatedNote.title;
+                        notes[i].content = updatedNote.content;
+                        notes[i].date    = date;
+                        break;
+                    }
+                }
+                closeModal();
+                renderNotes();
+            })
+            .catch(function(error) {
+                console.error("Fehler beim Aktualisieren der Notiz:", error);
+            });
     }
-
-    // Modal schließen und Grid neu rendern
-    closeModal();
-    renderNotes();
 }
 
 // CRUD – DELETE: Notiz löschen
@@ -425,22 +390,24 @@ function deleteNote(noteId) {
         card.classList.add("deleting");
     }
 
-    // Kurz warten bis die Animation fertig ist, dann aus dem Array entfernen
+    // Kurz warten bis die Animation fertig ist, dann beim Backend löschen
     setTimeout(function() {
-        // BACKEND-PLATZHALTER: Hier könnte später ein API-Call stehen:
-        // fetch("/api/notes/" + noteId, { method: "DELETE" })
-        //     .then(function() { renderNotes(); });
-
-        // Notiz aus dem Array entfernen
-        for (var i = 0; i < notes.length; i++) {
-            if (notes[i].id === noteId) {
-                notes.splice(i, 1); // 1 Element an Position i entfernen
-                break;
-            }
-        }
-
-        // Grid neu rendern
-        renderNotes();
+        fetch(BASE_URL + "/notes/" + noteId, { method: "DELETE" })
+            .then(function(response) {
+                if (!response.ok) { throw new Error("HTTP " + response.status); }
+                // Notiz aus dem lokalen Cache entfernen
+                for (var i = 0; i < notes.length; i++) {
+                    if (notes[i].id === noteId) {
+                        notes.splice(i, 1);
+                        break;
+                    }
+                }
+                renderNotes();
+            })
+            .catch(function(error) {
+                console.error("Fehler beim Löschen der Notiz:", error);
+                renderNotes();
+            });
     }, DELETE_ANIMATION_MS); // Dauer der CSS-Lösch-Animation (.note-card.deleting)
 }
 
