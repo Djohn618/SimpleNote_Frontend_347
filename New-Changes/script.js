@@ -1,43 +1,9 @@
 // SimpleNote - script.js
-// Notizen anzeigen, erstellen, bearbeiten, löschen
+// Notizen anzeigen, erstellen, bearbeiten, löschen - via Backend API
 
 
-// Alle Notizen stehen in diesem Array
-var notes = [
-    {
-        id: 1,
-        title: "Willkommen bei SimpleNote",
-        content: "Das ist deine erste Notiz! Klicke auf den Bleistift-Button, um sie zu bearbeiten. Mit dem Papierkorb kannst du sie löschen. Und mit dem + links erstellst du neue Notizen."
-    },
-    {
-        id: 2,
-        title: "Einkaufsliste",
-        content: "Milch, Brot, Butter\nÄpfel, Bananen\nKaffee, Tee\nNudeln, Tomatensoße\nKäse, Joghurt"
-    },
-    {
-        id: 3,
-        title: "Projektideen für 2024",
-        content: "Neue App Idee: Eine App, die Aufgaben automatisch priorisiert.\n\nNutzer gibt Aufgaben ein und die App sortiert sie nach Wichtigkeit und Deadline.\n\nNächste Schritte: Prototyp skizzieren, Tech-Stack festlegen."
-    },
-    {
-        id: 4,
-        title: "Lernziele dieses Jahr",
-        content: "JavaScript vertiefen\nCSS Animationen meistern\nHTML Semantik verbessern\nEin vollständiges Portfolio-Projekt bauen\nSQL Grundlagen wiederholen"
-    },
-    {
-        id: 5,
-        title: "Design Inspiration",
-        content: "Dribbble und Behance regelmäßig anschauen. Interessante Farb-Paletten und Layouts für zukünftige Projekte notieren. Besonders: minimalistische UIs mit starken Typografien."
-    },
-    {
-        id: 6,
-        title: "Meeting-Notizen",
-        content: "Nächstes Meeting: Freitag 14:00 Uhr\nAgenda: Projektstand besprechen\nTeilnehmer: Team Alpha\nWichtig: Präsentation vorbereiten!"
-    }
-];
-
-// Zähler für neue Notiz-IDs
-var nextId = 7;
+// Backend-URL (läuft in einem separaten Container)
+var API_BASE_URL = "http://localhost:8080/notes";
 
 // Welche Notiz gerade bearbeitet wird (null = neue Notiz)
 var selectedNote = null;
@@ -58,47 +24,60 @@ function getNoteColor(index) {
 }
 
 
-// Notizen anzeigen
-// Liest das notes-Array und baut die Karten im Grid
+// Alle Notizen vom Backend laden und anzeigen
 function renderNotes() {
     var grid = document.getElementById("notesGrid");
     var searchTerm = document.getElementById("searchInput").value.toLowerCase().trim();
 
-    // Grid leeren
     grid.innerHTML = "";
 
-    // Notizen nach Suchbegriff filtern
-    var filteredNotes = [];
-    for (var i = 0; i < notes.length; i++) {
-        var note = notes[i];
-        var titelPasst = note.title.toLowerCase().indexOf(searchTerm) !== -1;
-        var inhaltPasst = note.content.toLowerCase().indexOf(searchTerm) !== -1;
+    fetch(API_BASE_URL)
+        .then(function(response) {
+            if (!response.ok) {
+                throw new Error("Fehler beim Laden der Notizen");
+            }
+            return response.json();
+        })
+        .then(function(notes) {
+            // Notizen nach Suchbegriff filtern
+            var filteredNotes = [];
+            for (var i = 0; i < notes.length; i++) {
+                var note = notes[i];
+                var titelPasst = note.title.toLowerCase().indexOf(searchTerm) !== -1;
+                var inhaltPasst = (note.content || "").toLowerCase().indexOf(searchTerm) !== -1;
 
-        if (titelPasst || inhaltPasst) {
-            filteredNotes.push(note);
-        }
-    }
+                if (titelPasst || inhaltPasst) {
+                    filteredNotes.push(note);
+                }
+            }
 
-    // Keine Notizen gefunden: Hinweis anzeigen
-    if (filteredNotes.length === 0) {
-        var hinweis = document.createElement("div");
-        hinweis.className = "empty-message";
+            // Keine Notizen gefunden: Hinweis anzeigen
+            if (filteredNotes.length === 0) {
+                var hinweis = document.createElement("div");
+                hinweis.className = "empty-message";
 
-        if (searchTerm !== "") {
-            hinweis.textContent = 'Keine Notizen für "' + searchTerm + '" gefunden.';
-        } else {
-            hinweis.textContent = "Noch keine Notizen vorhanden. Klicke auf + um deine erste zu erstellen!";
-        }
+                if (searchTerm !== "") {
+                    hinweis.textContent = 'Keine Notizen für "' + searchTerm + '" gefunden.';
+                } else {
+                    hinweis.textContent = "Noch keine Notizen vorhanden. Klicke auf + um deine erste zu erstellen!";
+                }
 
-        grid.appendChild(hinweis);
-        return;
-    }
+                grid.appendChild(hinweis);
+                return;
+            }
 
-    // Jede Notiz als Karte einfügen
-    for (var j = 0; j < filteredNotes.length; j++) {
-        var karte = createNoteCard(filteredNotes[j], j);
-        grid.appendChild(karte);
-    }
+            // Jede Notiz als Karte einfügen
+            for (var j = 0; j < filteredNotes.length; j++) {
+                var karte = createNoteCard(filteredNotes[j], j);
+                grid.appendChild(karte);
+            }
+        })
+        .catch(function(error) {
+            var hinweis = document.createElement("div");
+            hinweis.className = "empty-message";
+            hinweis.textContent = "Notizen konnten nicht geladen werden. Bitte Backend prüfen.";
+            grid.appendChild(hinweis);
+        });
 }
 
 // Erstellt eine einzelne Notizkarte und gibt sie zurück
@@ -114,7 +93,7 @@ function createNoteCard(note, farbIndex) {
     titelEl.textContent = note.title;
 
     // Inhalts-Vorschau (maximal 120 Zeichen)
-    var vorschau = note.content;
+    var vorschau = note.content || "";
     if (vorschau.length > 120) {
         vorschau = vorschau.substring(0, 120) + "...";
     }
@@ -141,14 +120,11 @@ function createNoteCard(note, farbIndex) {
 
     // noteId in Variable, damit onclick richtig funktioniert
     var noteId = note.id;
+    var noteTitle = note.title;
+    var noteContent = note.content || "";
 
     bearbeitenBtn.onclick = function() {
-        for (var k = 0; k < notes.length; k++) {
-            if (notes[k].id === noteId) {
-                openEditModal(notes[k]);
-                break;
-            }
-        }
+        openEditModal({ id: noteId, title: noteTitle, content: noteContent });
     };
 
     // Löschen-Button
@@ -196,7 +172,7 @@ function openEditModal(note) {
     showModal();
 }
 
-// Notiz speichern (neu oder aktualisieren)
+// Notiz speichern: POST (neu) oder PUT (aktualisieren) via fetch
 function saveNote() {
     var titelInput = document.getElementById("modalTitle");
     var inhaltInput = document.getElementById("modalContent");
@@ -210,49 +186,70 @@ function saveNote() {
         return;
     }
 
+    var dto = { title: titel, content: inhalt };
+
     if (selectedNote === null) {
-        // Neue Notiz erstellen
-        var neueNotiz = {
-            id: nextId,
-            title: titel,
-            content: inhalt
-        };
-
-        nextId = nextId + 1;
-
-        // Neue Notiz am Anfang des Arrays (neueste zuerst)
-        notes.unshift(neueNotiz);
-
+        // Neue Notiz erstellen: POST /notes
+        fetch(API_BASE_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(dto)
+        })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error("Fehler beim Erstellen der Notiz");
+                }
+                return response.json();
+            })
+            .then(function() {
+                closeModal();
+                renderNotes();
+            })
+            .catch(function(error) {
+                alert("Notiz konnte nicht gespeichert werden. Bitte Backend prüfen. (" + error.message + ")");
+            });
     } else {
-        // Bestehende Notiz aktualisieren
-        for (var i = 0; i < notes.length; i++) {
-            if (notes[i].id === selectedNote.id) {
-                notes[i].title = titel;
-                notes[i].content = inhalt;
-                break;
-            }
-        }
+        // Bestehende Notiz aktualisieren: PUT /notes/{id}
+        fetch(API_BASE_URL + "/" + selectedNote.id, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(dto)
+        })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error("Fehler beim Aktualisieren der Notiz");
+                }
+                return response.json();
+            })
+            .then(function() {
+                closeModal();
+                renderNotes();
+            })
+            .catch(function(error) {
+                alert("Notiz konnte nicht aktualisiert werden. Bitte Backend prüfen. (" + error.message + ")");
+            });
     }
-
-    closeModal();
-    renderNotes();
 }
 
-// Notiz löschen
+// Notiz löschen: DELETE /notes/{id} via fetch
 function deleteNote(noteId) {
     var bestaetigt = confirm("Möchtest du diese Notiz wirklich löschen?");
     if (!bestaetigt) {
         return;
     }
 
-    for (var i = 0; i < notes.length; i++) {
-        if (notes[i].id === noteId) {
-            notes.splice(i, 1);
-            break;
-        }
-    }
-
-    renderNotes();
+    fetch(API_BASE_URL + "/" + noteId, {
+        method: "DELETE"
+    })
+        .then(function(response) {
+            if (!response.ok) {
+                throw new Error("Fehler beim Löschen der Notiz");
+            }
+            renderNotes();
+        })
+        .catch(function(error) {
+            alert("Notiz konnte nicht gelöscht werden. Bitte Backend prüfen. (" + error.message + ")");
+        });
 }
 
 
