@@ -1,8 +1,4 @@
-/* ============================================================
-   SimpleNote - styles.css
-   Vereinfachte Styles: Format-Panel, Datumseingabe und
-   Farb-Punkte wurden entfernt.
-   ============================================================ */
+/* SimpleNote - styles.css */
 
 
 /* Basis-Reset */
@@ -22,9 +18,7 @@ body {
 }
 
 
-/* ============================================================
-   SEITENLEISTE
-   ============================================================ */
+/* Seitenleiste */
 
 .sidebar {
     width: 120px;
@@ -41,7 +35,6 @@ body {
     z-index: 10;
 }
 
-/* App-Name */
 .sidebar-logo {
     font-size: 12px;
     font-weight: 800;
@@ -51,7 +44,6 @@ body {
     line-height: 1.4;
 }
 
-/* Plus-Button */
 .add-note-btn {
     width: 54px;
     height: 54px;
@@ -63,20 +55,12 @@ body {
     align-items: center;
     justify-content: center;
     margin-top: 32px;
-    transition: transform 0.2s ease, background-color 0.2s ease;
-    outline: none;
 }
 
 .add-note-btn:hover {
-    transform: scale(1.1) rotate(90deg);
     background-color: #3a3a3a;
 }
 
-.add-note-btn:active {
-    transform: scale(0.95);
-}
-
-/* Plus-Zeichen */
 .plus-icon {
     color: white;
     font-size: 32px;
@@ -87,9 +71,7 @@ body {
 }
 
 
-/* ============================================================
-   HAUPT-INHALTSBEREICH
-   ============================================================ */
+/* Haupt-Inhaltsbereich */
 
 .main-content {
     margin-left: 120px;
@@ -102,9 +84,7 @@ body {
 }
 
 
-/* ============================================================
-   KOPFZEILE MIT SUCHLEISTE
-   ============================================================ */
+/* Kopfzeile mit Suchleiste */
 
 .top-header {
     padding: 20px 44px;
@@ -138,15 +118,12 @@ body {
 }
 
 
-/* ============================================================
-   NOTIZEN-BEREICH
-   ============================================================ */
+/* Notizen-Bereich */
 
 .notes-section {
     padding: 36px 44px 60px;
 }
 
-/* Große "Notes"-Überschrift */
 .notes-heading {
     font-size: 78px;
     font-weight: 900;
@@ -156,7 +133,6 @@ body {
     line-height: 1;
 }
 
-/* Grid für die Notizkarten */
 .notes-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(258px, 1fr));
@@ -165,9 +141,7 @@ body {
 }
 
 
-/* ============================================================
-   NOTIZKARTE
-   ============================================================ */
+/* Notizkarte */
 
 .note-card {
     border-radius: 22px;
@@ -176,27 +150,12 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-
-    /* Startzustand: unsichtbar, leicht versetzt */
-    opacity: 0;
-    transform: translateY(26px);
-    transition: opacity 0.4s ease, transform 0.4s ease,
-                box-shadow 0.25s ease;
 }
 
-/* Karte erscheinen lassen */
-.note-card.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Hover-Effekt */
 .note-card:hover {
-    box-shadow: 0 14px 44px rgba(0, 0, 0, 0.14);
-    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
-/* Titel der Karte */
 .note-card-title {
     font-size: 17px;
     font-weight: 700;
@@ -209,7 +168,6 @@ body {
     -webkit-box-orient: vertical;
 }
 
-/* Inhalts-Vorschau */
 .note-card-content {
     font-size: 14px;
     color: #2a2a2a;
@@ -221,28 +179,18 @@ body {
     -webkit-box-orient: vertical;
 }
 
-/* Fußzeile der Karte */
 .note-card-footer {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     margin-top: 18px;
 }
 
-/* Datumsanzeige */
-.note-card-date {
-    font-size: 13px;
-    color: #2a2a2a;
-    font-weight: 500;
-}
-
-/* Button-Container */
 .note-card-buttons {
     display: flex;
     gap: 7px;
 }
 
-/* Aktions-Buttons (Bearbeiten / Löschen) */
 .note-btn {
     width: 38px;
     height: 38px;
@@ -253,35 +201,12 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
-}
-
-/* Bearbeiten-Button immer sichtbar */
-.edit-btn {
-    opacity: 1;
-}
-
-/* Löschen-Button erscheint erst beim Hover */
-.delete-btn {
-    opacity: 0;
-    transform: scale(0.7);
-}
-
-.note-card:hover .delete-btn {
-    opacity: 1;
-    transform: scale(1);
 }
 
 .note-btn:hover {
-    transform: scale(1.18) !important;
     background-color: #444444;
 }
 
-.note-btn:active {
-    transform: scale(0.9) !important;
-}
-
-/* Hinweis wenn keine Notizen vorhanden */
 .empty-message {
     grid-column: 1 / -1;
     text-align: center;
@@ -291,17 +216,8 @@ body {
     line-height: 1.6;
 }
 
-/* Animation beim Löschen */
-.note-card.deleting {
-    opacity: 0;
-    transform: scale(0.78) translateY(-12px);
-    transition: opacity 0.36s ease, transform 0.36s ease;
-}
 
-
-/* ============================================================
-   MODAL OVERLAY
-   ============================================================ */
+/* Modal Overlay */
 
 .modal-overlay {
     position: fixed;
@@ -311,27 +227,17 @@ body {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.48);
     z-index: 100;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
-
-    /* Standardmäßig unsichtbar */
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .modal-overlay.active {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
+    display: flex;
 }
 
 
-/* ============================================================
-   MODAL (Bearbeitungsfenster)
-   ============================================================ */
+/* Modal */
 
 .modal {
     background-color: #ffffff;
@@ -343,26 +249,14 @@ body {
     flex-direction: column;
     overflow: hidden;
     box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
-
-    /* Startzustand für Einblend-Animation */
-    transform: translateY(36px) scale(0.96);
-    opacity: 0;
-    transition: transform 0.35s ease, opacity 0.3s ease;
 }
 
-.modal.visible {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-}
-
-/* Modal-Kopfzeile: nur noch Titelfeld */
 .modal-header {
     padding: 28px 32px 18px;
     border-bottom: 1px solid #f0f0f0;
     flex-shrink: 0;
 }
 
-/* Großes Titelfeld */
 .modal-title-input {
     font-size: 26px;
     font-weight: 700;
@@ -378,19 +272,12 @@ body {
     color: #cccccc;
 }
 
-/* Schüttel-Animation wenn Titel leer */
-.modal-title-input.shake {
-    animation: shake 0.38s ease;
-}
-
-/* Modal-Hauptbereich: nur noch Textarea */
 .modal-body {
     flex: 1;
     overflow: hidden;
     min-height: 0;
 }
 
-/* Textarea für den Notizinhalt */
 .modal-content-input {
     width: 100%;
     height: 100%;
@@ -411,9 +298,7 @@ body {
 }
 
 
-/* ============================================================
-   MODAL-FUSSZEILE
-   ============================================================ */
+/* Modal-Fußzeile */
 
 .modal-footer {
     display: flex;
@@ -424,7 +309,6 @@ body {
     flex-shrink: 0;
 }
 
-/* Abbrechen-Button */
 .btn-cancel {
     padding: 12px 26px;
     border-radius: 12px;
@@ -435,15 +319,12 @@ body {
     font-weight: 500;
     cursor: pointer;
     font-family: inherit;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .btn-cancel:hover {
     background-color: #f5f5f5;
-    border-color: #bbbbbb;
 }
 
-/* Speichern-Button */
 .btn-save {
     padding: 12px 30px;
     border-radius: 12px;
@@ -454,7 +335,6 @@ body {
     font-weight: 600;
     cursor: pointer;
     font-family: inherit;
-    transition: background-color 0.2s ease;
 }
 
 .btn-save:hover {
@@ -462,23 +342,7 @@ body {
 }
 
 
-/* ============================================================
-   ANIMATIONEN
-   ============================================================ */
-
-/* Schüttel-Animation für das Titelfeld */
-@keyframes shake {
-    0%,  100% { transform: translateX(0); }
-    20%        { transform: translateX(-9px); }
-    40%        { transform: translateX(9px); }
-    60%        { transform: translateX(-6px); }
-    80%        { transform: translateX(6px); }
-}
-
-
-/* ============================================================
-   RESPONSIVE (kleine Bildschirme)
-   ============================================================ */
+/* Responsive (kleine Bildschirme) */
 
 @media (max-width: 700px) {
     .sidebar {

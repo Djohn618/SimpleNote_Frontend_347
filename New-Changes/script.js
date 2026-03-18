@@ -1,51 +1,38 @@
-// ============================================================
 // SimpleNote - script.js
-// Logik der App: Notizen anzeigen, erstellen, bearbeiten, löschen
-// ============================================================
+// Notizen anzeigen, erstellen, bearbeiten, löschen
 
 
-// ============================================================
-// DATEN
-// Alle Notizen stehen in diesem Array.
-// Jede Notiz hat: id, title, content, date
-// ============================================================
-
+// Alle Notizen stehen in diesem Array
 var notes = [
     {
         id: 1,
         title: "Willkommen bei SimpleNote",
-        content: "Das ist deine erste Notiz! Klicke auf den Bleistift-Button, um sie zu bearbeiten. Mit dem Papierkorb kannst du sie löschen. Und mit dem + links erstellst du neue Notizen.",
-        date: "2024-05-21"
+        content: "Das ist deine erste Notiz! Klicke auf den Bleistift-Button, um sie zu bearbeiten. Mit dem Papierkorb kannst du sie löschen. Und mit dem + links erstellst du neue Notizen."
     },
     {
         id: 2,
         title: "Einkaufsliste",
-        content: "Milch, Brot, Butter\nÄpfel, Bananen\nKaffee, Tee\nNudeln, Tomatensoße\nKäse, Joghurt",
-        date: "2024-05-22"
+        content: "Milch, Brot, Butter\nÄpfel, Bananen\nKaffee, Tee\nNudeln, Tomatensoße\nKäse, Joghurt"
     },
     {
         id: 3,
         title: "Projektideen für 2024",
-        content: "Neue App Idee: Eine App, die Aufgaben automatisch priorisiert.\n\nNutzer gibt Aufgaben ein und die App sortiert sie nach Wichtigkeit und Deadline.\n\nNächste Schritte: Prototyp skizzieren, Tech-Stack festlegen.",
-        date: "2024-05-25"
+        content: "Neue App Idee: Eine App, die Aufgaben automatisch priorisiert.\n\nNutzer gibt Aufgaben ein und die App sortiert sie nach Wichtigkeit und Deadline.\n\nNächste Schritte: Prototyp skizzieren, Tech-Stack festlegen."
     },
     {
         id: 4,
         title: "Lernziele dieses Jahr",
-        content: "JavaScript vertiefen\nCSS Animationen meistern\nHTML Semantik verbessern\nEin vollständiges Portfolio-Projekt bauen\nSQL Grundlagen wiederholen",
-        date: "2024-05-26"
+        content: "JavaScript vertiefen\nCSS Animationen meistern\nHTML Semantik verbessern\nEin vollständiges Portfolio-Projekt bauen\nSQL Grundlagen wiederholen"
     },
     {
         id: 5,
         title: "Design Inspiration",
-        content: "Dribbble und Behance regelmäßig anschauen. Interessante Farb-Paletten und Layouts für zukünftige Projekte notieren. Besonders: minimalistische UIs mit starken Typografien.",
-        date: "2024-05-28"
+        content: "Dribbble und Behance regelmäßig anschauen. Interessante Farb-Paletten und Layouts für zukünftige Projekte notieren. Besonders: minimalistische UIs mit starken Typografien."
     },
     {
         id: 6,
         title: "Meeting-Notizen",
-        content: "Nächstes Meeting: Freitag 14:00 Uhr\nAgenda: Projektstand besprechen\nTeilnehmer: Team Alpha\nWichtig: Präsentation vorbereiten!",
-        date: "2024-05-30"
+        content: "Nächstes Meeting: Freitag 14:00 Uhr\nAgenda: Projektstand besprechen\nTeilnehmer: Team Alpha\nWichtig: Präsentation vorbereiten!"
     }
 ];
 
@@ -65,50 +52,14 @@ var noteColors = [
     "#4ECDC4"
 ];
 
-
-// ============================================================
-// HILFSFUNKTIONEN
-// ============================================================
-
 // Gibt die Farbe für eine Karte anhand ihrer Position zurück
 function getNoteColor(index) {
     return noteColors[index % noteColors.length];
 }
 
-// Formatiert ein Datum von "2024-05-21" zu "May 21, 2024"
-function formatDate(dateString) {
-    if (!dateString) {
-        return "";
-    }
 
-    var monthNames = [
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    ];
-
-    var parts = dateString.split("-");
-    var year = parts[0];
-    var monthIndex = parseInt(parts[1], 10) - 1;
-    var day = parseInt(parts[2], 10);
-
-    return monthNames[monthIndex] + " " + day + ", " + year;
-}
-
-// Gibt das heutige Datum als "YYYY-MM-DD" zurück
-function getTodayDate() {
-    var today = new Date();
-    var year = today.getFullYear();
-    var month = String(today.getMonth() + 1).padStart(2, "0");
-    var day = String(today.getDate()).padStart(2, "0");
-    return year + "-" + month + "-" + day;
-}
-
-
-// ============================================================
-// NOTIZEN ANZEIGEN
+// Notizen anzeigen
 // Liest das notes-Array und baut die Karten im Grid
-// ============================================================
-
 function renderNotes() {
     var grid = document.getElementById("notesGrid");
     var searchTerm = document.getElementById("searchInput").value.toLowerCase().trim();
@@ -120,8 +71,8 @@ function renderNotes() {
     var filteredNotes = [];
     for (var i = 0; i < notes.length; i++) {
         var note = notes[i];
-        var titelPasst   = note.title.toLowerCase().indexOf(searchTerm) !== -1;
-        var inhaltPasst  = note.content.toLowerCase().indexOf(searchTerm) !== -1;
+        var titelPasst = note.title.toLowerCase().indexOf(searchTerm) !== -1;
+        var inhaltPasst = note.content.toLowerCase().indexOf(searchTerm) !== -1;
 
         if (titelPasst || inhaltPasst) {
             filteredNotes.push(note);
@@ -147,21 +98,11 @@ function renderNotes() {
     for (var j = 0; j < filteredNotes.length; j++) {
         var karte = createNoteCard(filteredNotes[j], j);
         grid.appendChild(karte);
-
-        // Karten erscheinen nacheinander (Stagger-Effekt)
-        var verzoegerung = j * 75;
-        (function(karteElement, delay) {
-            setTimeout(function() {
-                karteElement.classList.add("visible");
-            }, delay);
-        })(karte, verzoegerung);
     }
 }
 
 // Erstellt eine einzelne Notizkarte und gibt sie zurück
 function createNoteCard(note, farbIndex) {
-
-    // Haupt-Container
     var karte = document.createElement("div");
     karte.className = "note-card";
     karte.style.backgroundColor = getNoteColor(farbIndex);
@@ -181,16 +122,10 @@ function createNoteCard(note, farbIndex) {
     inhaltEl.className = "note-card-content";
     inhaltEl.textContent = vorschau;
 
-    // Fußzeile: Datum links, Buttons rechts
+    // Fußzeile mit Buttons
     var fusszeileEl = document.createElement("div");
     fusszeileEl.className = "note-card-footer";
 
-    // Datum anzeigen
-    var datumEl = document.createElement("span");
-    datumEl.className = "note-card-date";
-    datumEl.textContent = formatDate(note.date);
-
-    // Button-Container
     var buttonContainer = document.createElement("div");
     buttonContainer.className = "note-card-buttons";
 
@@ -230,10 +165,8 @@ function createNoteCard(note, farbIndex) {
         deleteNote(noteId);
     };
 
-    // Alles zusammenbauen
     buttonContainer.appendChild(bearbeitenBtn);
     buttonContainer.appendChild(loeschenBtn);
-    fusszeileEl.appendChild(datumEl);
     fusszeileEl.appendChild(buttonContainer);
     karte.appendChild(titelEl);
     karte.appendChild(inhaltEl);
@@ -243,16 +176,10 @@ function createNoteCard(note, farbIndex) {
 }
 
 
-// ============================================================
-// CRUD-FUNKTIONEN
-// Create, Read, Update, Delete
-// ============================================================
-
 // Modal zum Erstellen einer neuen Notiz öffnen
 function openCreateModal() {
     selectedNote = null;
 
-    // Felder leeren
     document.getElementById("modalTitle").value = "";
     document.getElementById("modalContent").value = "";
 
@@ -263,7 +190,6 @@ function openCreateModal() {
 function openEditModal(note) {
     selectedNote = note;
 
-    // Felder mit Notiz-Daten befüllen
     document.getElementById("modalTitle").value = note.title;
     document.getElementById("modalContent").value = note.content;
 
@@ -272,31 +198,24 @@ function openEditModal(note) {
 
 // Notiz speichern (neu oder aktualisieren)
 function saveNote() {
-    var titelInput   = document.getElementById("modalTitle");
-    var inhaltInput  = document.getElementById("modalContent");
+    var titelInput = document.getElementById("modalTitle");
+    var inhaltInput = document.getElementById("modalContent");
 
-    var titel   = titelInput.value.trim();
-    var inhalt  = inhaltInput.value.trim();
+    var titel = titelInput.value.trim();
+    var inhalt = inhaltInput.value.trim();
 
     // Titel darf nicht leer sein
     if (titel === "") {
-        // Schüttel-Animation als Hinweis
-        titelInput.classList.add("shake");
-        setTimeout(function() {
-            titelInput.classList.remove("shake");
-        }, 400);
         titelInput.focus();
         return;
     }
 
     if (selectedNote === null) {
         // Neue Notiz erstellen
-        // Das Datum wird automatisch auf heute gesetzt
         var neueNotiz = {
-            id:      nextId,
-            title:   titel,
-            content: inhalt,
-            date:    getTodayDate()
+            id: nextId,
+            title: titel,
+            content: inhalt
         };
 
         nextId = nextId + 1;
@@ -308,9 +227,8 @@ function saveNote() {
         // Bestehende Notiz aktualisieren
         for (var i = 0; i < notes.length; i++) {
             if (notes[i].id === selectedNote.id) {
-                notes[i].title   = titel;
+                notes[i].title = titel;
                 notes[i].content = inhalt;
-                // Datum bleibt unverändert
                 break;
             }
         }
@@ -327,96 +245,56 @@ function deleteNote(noteId) {
         return;
     }
 
-    // Karte im DOM finden und Lösch-Animation starten
-    var karte = document.querySelector('[data-note-id="' + noteId + '"]');
-    if (karte) {
-        karte.classList.add("deleting");
+    for (var i = 0; i < notes.length; i++) {
+        if (notes[i].id === noteId) {
+            notes.splice(i, 1);
+            break;
+        }
     }
 
-    // Warten bis die Animation fertig ist, dann löschen
-    setTimeout(function() {
-        for (var i = 0; i < notes.length; i++) {
-            if (notes[i].id === noteId) {
-                notes.splice(i, 1);
-                break;
-            }
-        }
-        renderNotes();
-    }, 380);
+    renderNotes();
 }
 
-
-// ============================================================
-// MODAL STEUERN
-// ============================================================
 
 // Modal einblenden
 function showModal() {
     var overlay = document.getElementById("modalOverlay");
-    var modal   = document.getElementById("noteModal");
-
     overlay.classList.add("active");
-
-    // Kleine Pause, damit die Animation sauber startet
-    setTimeout(function() {
-        modal.classList.add("visible");
-    }, 20);
-
-    // Fokus auf Titelfeld
-    setTimeout(function() {
-        document.getElementById("modalTitle").focus();
-    }, 60);
+    document.getElementById("modalTitle").focus();
 }
 
 // Modal ausblenden
 function closeModal() {
     var overlay = document.getElementById("modalOverlay");
-    var modal   = document.getElementById("noteModal");
-
-    modal.classList.remove("visible");
-
-    // Overlay erst nach der Schließ-Animation ausblenden
-    setTimeout(function() {
-        overlay.classList.remove("active");
-    }, 350);
-
+    overlay.classList.remove("active");
     selectedNote = null;
 }
 
 
-// ============================================================
-// EVENT LISTENER
-// Benutzer-Aktionen mit Funktionen verbinden
-// ============================================================
+// Event Listener
 
-// Suchfeld: Notizen filtern bei jeder Eingabe
 document.getElementById("searchInput").addEventListener("input", function() {
     renderNotes();
 });
 
-// Plus-Button: neue Notiz erstellen
 document.getElementById("addNoteBtn").addEventListener("click", function() {
     openCreateModal();
 });
 
-// Speichern-Button im Modal
 document.getElementById("saveBtn").addEventListener("click", function() {
     saveNote();
 });
 
-// Abbrechen-Button im Modal
 document.getElementById("cancelBtn").addEventListener("click", function() {
     closeModal();
 });
 
-// Klick auf den Hintergrund (Overlay) schließt das Modal
 document.getElementById("modalOverlay").addEventListener("click", function(event) {
     if (event.target === this) {
         closeModal();
     }
 });
 
-// ESC-Taste schließt das Modal
 document.addEventListener("keydown", function(event) {
     if (event.key === "Escape") {
         var overlay = document.getElementById("modalOverlay");
@@ -427,8 +305,5 @@ document.addEventListener("keydown", function(event) {
 });
 
 
-// ============================================================
-// APP STARTEN
-// Beim Laden der Seite alle Notizen anzeigen
-// ============================================================
+// App starten
 renderNotes();
